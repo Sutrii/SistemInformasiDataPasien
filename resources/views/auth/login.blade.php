@@ -15,18 +15,30 @@
                 <p class="text-sm text-gray-600 mb-6">Welcome!</p>
 
                 <form method="POST" action="{{ route('login') }}">
-                    @csrf
-
                     <div class="mb-4">
                         <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
                         <input id="email" name="email" type="email" required autofocus
                             class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-[003E93] focus:border-[003E93]" />
                     </div>
 
-                    <div class="mb-4">
+                    <div class="mb-2">
                         <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
                         <input id="password" name="password" type="password" required
                             class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-[003E93] focus:border-[003E93]" />
+                    </div>
+
+                    @csrf
+
+                    @if ($errors->any())
+                        <div class="mb-4 text-sm text-red-600 text-center">
+                            {{ $errors->first('email') }}
+                        </div>
+                    @endif
+
+                    <div class="mb-4 text-left">
+                        <a href="{{ route('password.request') }}" class="text-sm text-blue-600 hover:underline">
+                            Forgot your password?
+                        </a>
                     </div>
 
                     <div class="mb-4 flex items-center">
