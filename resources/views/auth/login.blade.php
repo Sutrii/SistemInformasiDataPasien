@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
+    <link rel="icon" href="{{ asset('build/assets/logo.png') }}" type="image/png">
     @vite('resources/css/app.css')
 </head>
 <body class="bg-gray-100 m-0 p-0 overflow-hidden">
@@ -34,7 +35,7 @@
                         <label for="remember_me" class="ml-2 block text-sm text-gray-600">Remember me</label>
                     </div>
 
-                    <div class="flex items-center justify-between">
+                    <div class="flex items-center justify-between mb-4">
                         <button type="submit"
                             class="px-4 py-2 rounded-md transition text-white"
                             style="background-color: #003E93;"
@@ -43,6 +44,11 @@
                             Log in
                         </button>
                     </div>
+
+                    <p class="text-sm text-gray-600 text-center">
+                        Don't have an account? 
+                        <a href="{{ route('register') }}" class="text-blue-600 hover:underline">Register now</a>
+                    </p>
                 </form>
             </div>
         </div>
