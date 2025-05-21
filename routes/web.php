@@ -8,9 +8,7 @@ use Maatwebsite\Excel\Facades\Excel;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\Pasien;
 
-Route::get('/pasiens', [PasienController::class, 'index'])->name('dashboard');
-
-Route::redirect('/', '/pasiens');
+Route::get('/', [PasienController::class, 'index'])->name('dashboard');
 
 Route::get('/export-excel', function () {
     return Excel::download(new PasienExport, 'data_pasien.xlsx');
@@ -31,6 +29,7 @@ Route::middleware(['auth'])->group(function () {
 });
 
 require __DIR__.'/auth.php';
+
 
 
 

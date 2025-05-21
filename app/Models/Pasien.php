@@ -9,7 +9,7 @@ class Pasien extends Model
 {
     use HasFactory;
     protected $fillable = [
-    'nik', 'nama', 'no_rm', 'alamat', 'agama', 'tanggal_lahir', 'register_date',
+    'nik', 'nama', 'no_rm', 'alamat', 'agama', 'tanggal_lahir', 'register_date', 'foto'
 ];
 
 }
