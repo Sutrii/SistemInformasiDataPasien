@@ -8,6 +8,9 @@ use Illuminate\Support\Carbon;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Log;
+use App\Exports\PasienExport;
+use Maatwebsite\Excel\Facades\Excel;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class PasienController extends Controller
 {
@@ -22,7 +25,7 @@ class PasienController extends Controller
 
         if ($request->filled('tanggal')) {
             $query->whereDate('register_date', $request->tanggal);
-        }
+        }        
 
         $pasiens = $query->orderByDesc('register_date')->get();
 
@@ -39,8 +42,20 @@ class PasienController extends Controller
     private function generateNoRM()
     {
         $datePart = Carbon::now()->format('ymd');
-        $countToday = Pasien::whereDate('register_date', now()->toDateString())->count() + 1;
-        return $datePart . '-' . str_pad($countToday, 3, '0', STR_PAD_LEFT);
+
+        $latestPasien = Pasien::withTrashed()
+            ->where('no_rm', 'like', $datePart . '-%')
+            ->orderByDesc('no_rm')
+            ->first();
+
+        if ($latestPasien) {
+            $lastNumber = (int)substr($latestPasien->no_rm, -3);
+            $nextNumber = $lastNumber + 1;
+        } else {
+            $nextNumber = 1;
+        }
+
+        return $datePart . str_pad($nextNumber, 3, '0', STR_PAD_LEFT);
     }
 
     public function store(Request $request)
@@ -147,4 +162,26 @@ class PasienController extends Controller
 
         return redirect()->route('pasiens.index')->with('success', 'Data pasien berhasil dikembalikan');
     }
+
+    public function exportExcel(Request $request)
+    {
+        $tanggal = $request->query('tanggal'); 
+        return Excel::download(new PasienExport($tanggal), 'data_pasien.xlsx');
+    }
+
+    public function exportPdf(Request $request)
+    {
+        $tanggal = $request->query('tanggal');
+    
+        $query = Pasien::with('pendaftaran')->withTrashed();
+    
+        if (!empty($tanggal)) {
+            $query->whereDate('register_date', '=', $tanggal);
+        }
+    
+        $pasiens = $query->get();
+    
+        $pdf = Pdf::loadView('exports.pasien_pdf', compact('pasiens'))->setPaper('a4', 'landscape');
+        return $pdf->download('data_pasien.pdf');
+    }    
 }

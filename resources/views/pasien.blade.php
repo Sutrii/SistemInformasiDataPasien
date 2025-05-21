@@ -36,7 +36,7 @@
                                 <th class="py-2 px-4 border">Alamat</th>
                                 <th class="py-2 px-4 border">Agama</th>
                                 <th class="py-2 px-4 border">Tanggal Lahir</th>
-                                <th class="py-2 px-4 border">Register Date</th>
+                                <th class="py-2 px-4 border">Tanggal Pendaftaran</th>
                                 <th class="py-2 px-4 border">Foto</th>
                                 <th class="py-2 px-4 border">Aksi</th>
                             </tr>
@@ -61,7 +61,6 @@
                                     <td class="py-2 px-4 border">
                                         <div class="flex flex-wrap items-center gap-2">
                                             @if ($pasien->trashed())
-                                                <!-- Tombol Restore -->
                                                 <form action="{{ route('pasiens.restore', $pasien->id) }}" method="POST" onsubmit="return confirm('Kembalikan data ini?')" class="inline">
                                                     @csrf
                                                     <button type="submit"
@@ -75,7 +74,6 @@
                                                     </button>
                                                 </form>
 
-                                                <!-- Tombol Hapus Permanen -->
                                                 <form action="{{ route('pasiens.forceDelete', $pasien->id) }}" method="POST" onsubmit="return confirm('Hapus permanen data ini?')" class="inline">
                                                     @csrf
                                                     @method('DELETE')
@@ -90,7 +88,6 @@
                                                     </button>
                                                 </form>
                                             @else
-                                                <!-- Tombol Edit -->
                                                 <button 
                                                     @click="editModalOpen = true; selectedPasien = {{ json_encode($pasien) }}" 
                                                     class="bg-yellow-500 hover:bg-yellow-600 text-white p-2 rounded text-sm inline-flex items-center justify-center"
@@ -102,7 +99,6 @@
                                                     </svg>
                                                 </button>
 
-                                                <!-- Tombol Soft Delete (Trash Icon) -->
                                                 <form action="{{ route('pasiens.destroy', $pasien->id) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus data ini?')" class="inline">
                                                     @csrf
                                                     @method('DELETE')
@@ -124,21 +120,24 @@
                         </tbody>
                     </table>
                     <div class="flex justify-end gap-2 mt-4">
-                        <a href="{{ route('pasiens.export.excel') }}" 
-                        class="bg-green-600 hover:bg-green-700 text-white px-4 py-1 rounded">
-                        Export Excel
-                        </a>
-
-                        <a href="{{ route('pasiens.export.pdf') }}" 
-                        class="bg-red-600 hover:bg-red-700 text-white px-4 py-1 rounded">
-                        Export PDF
-                        </a>
+                        <form method="GET" action="{{ route('pasiens.export.excel') }}">
+                            <input type="hidden" name="tanggal" value="{{ request('tanggal') }}">
+                            <button type="submit"
+                                class="bg-green-600 hover:bg-green-700 text-white px-4 py-1 rounded">
+                                Export Excel
+                            </button>
+                        <form method="GET" action="{{ route('pasiens.export.pdf') }}">
+                            <input type="hidden" name="tanggal" value="{{ request('tanggal') }}">
+                            <button type="submit"
+                                class="bg-red-600 hover:bg-red-700 text-white px-4 py-1 rounded">
+                                Export PDF
+                            </button>
+                        </form>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Modal Tambah Data Pasien -->
         <div 
             x-show="open" 
             x-cloak 
@@ -200,7 +199,6 @@
             </div>
         </div>
 
-        <!-- Modal Edit Pasien -->
         <div x-show="editModalOpen" x-cloak class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
             <div @click.outside="editModalOpen = false" class="bg-white p-6 rounded-lg shadow-lg w-full max-w-2xl">
                 <h2 class="text-xl font-semibold mb-4">Edit Pasien</h2>
@@ -221,7 +219,6 @@
 
                     <input type="date" name="tanggal_lahir" class="border px-2 py-1 rounded" x-model="selectedPasien.tanggal_lahir">
 
-                    <!-- Preview Foto -->
                     <template x-if="selectedPasien.foto">
                         <div>
                             <p class="text-sm text-gray-600 mb-1">Foto Saat Ini:</p>
@@ -229,7 +226,6 @@
                         </div>
                     </template>
 
-                    <!-- Input Ganti Foto -->
                     <div class="flex flex-col">
                         <label for="edit_foto" class="text-sm text-gray-700 mb-1">Foto</label>
                         <input 

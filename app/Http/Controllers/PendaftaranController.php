@@ -4,8 +4,11 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Pendaftaran;
+use App\Models\Pasien;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
+use App\Exports\PendataanPasienExport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class PendaftaranController extends Controller
 {
@@ -23,9 +26,11 @@ class PendaftaranController extends Controller
         }
 
         $pendaftaran = $query->orderByDesc('pendaftaran_date')->get();
+        $pasiens = Pasien::all();
 
         return view('pendaftaran', [
-            'pendaftaran' => $pendaftaran
+            'pendaftaran' => $pendaftaran,
+            'pasiens' => $pasiens
         ]);
     }
 
@@ -34,22 +39,58 @@ class PendaftaranController extends Controller
         return view('pendaftaran.create');
     }
 
+    public function filter(Request $request)
+    {
+        $start = $request->start_date;
+        $end = $request->end_date;
+
+        $query = Pendaftaran::withTrashed();
+
+        if ($start && $end) {
+            $query->whereBetween('pendaftaran_date', [$start, $end]);
+        }
+
+        $pendaftaran = $query->orderByDesc('pendaftaran_date')->with('pasien')->get();
+        $pasiens = Pasien::all();
+
+        return view('pendaftaran', [
+            'pendaftaran' => $pendaftaran,
+            'pasiens' => $pasiens,
+            'start' => $start,
+            'end' => $end
+        ]);
+    }
+
     private function generateNoPendaftaran()
     {
         $datePart = Carbon::now()->format('ymd');
-        $countToday = Pendaftaran::whereDate('pendaftaran_date', now()->toDateString())->count() + 1;
-        return $datePart . '-' . str_pad($countToday, 3, '0', STR_PAD_LEFT);
+
+        $latestPendaftar = Pendaftaran::withTrashed()
+            ->where('no_pendaftaran', 'like', $datePart . '-%')
+            ->orderByDesc('no_pendaftaran')
+            ->first();
+
+        if ($latestPendaftar){
+            $lastNumber = (int)substr($latestPendaftar->no_pendaftaran, -6);
+            $nextNumber = $lastNumber + 1;
+        } else {
+            $nextNumber = 1;
+        }
+
+        return $datePart . str_pad($nextNumber, 6, '0', STR_PAD_LEFT);
     }
 
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'nama' => 'required',
-            'no_rm' => 'required'
+            'no_rm' => 'required|exists:pasiens,no_rm',
         ]);
 
         $validated['no_pendaftaran'] = $this->generateNoPendaftaran();
         $validated['pendaftaran_date'] = now();
+
+        $pasiens = Pasien::where('no_rm', $validated['no_rm'])->first();
+        $validated['nama'] = $pasiens->nama;
 
         Pendaftaran::create($validated);
 
@@ -59,15 +100,15 @@ class PendaftaranController extends Controller
     public function update(Request $request, string $id)
     {
         $validated = $request->validate([
-            'nama' => 'required',
-            'no_rm' => 'required'
+            'pendaftaran_date' => 'required|date',
         ]);
 
         $pendaftaran = Pendaftaran::findOrFail($id);
+        $pendaftaran->update([
+            'pendaftaran_date' => $validated['pendaftaran_date']
+        ]);
 
-        $pendaftaran->update($validated);
-
-        return redirect()->route('pendaftaran.index')->with('success', 'Data pendaftaran berhasil diperbarui');
+        return redirect()->route('pendaftaran.index')->with('success', 'Tanggal pendaftaran berhasil diperbarui');
     }
 
     public function destroy($id)
@@ -92,5 +133,13 @@ class PendaftaranController extends Controller
         $pendaftaran->restore();
 
         return redirect()->route('pendaftaran.index')->with('success', 'Data pendaftaran berhasil dikembalikan');
+    }
+
+    public function exportExcel(Request $request)
+    {
+        $start = $request->query('start_date');
+        $end = $request->query('end_date');
+
+        return Excel::download(new PendataanPasienExport($start, $end), 'data_pendaftaran.xlsx');
     }
 }

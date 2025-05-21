@@ -2,6 +2,8 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\API\APIPasienController;
+use App\Http\Controllers\API\APIPendaftaranController;
 
 /*
 |--------------------------------------------------------------------------
@@ -17,3 +19,6 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+Route::get('/pasiens', [APIPasienController::class, 'index']);
+Route::get('/pendaftar', [APIPendaftaranController::class, 'index']);

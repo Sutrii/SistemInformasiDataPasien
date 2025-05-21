@@ -37,7 +37,7 @@
                                 <th class="py-2 px-4 border">Alamat</th>
                                 <th class="py-2 px-4 border">Agama</th>
                                 <th class="py-2 px-4 border">Tanggal Lahir</th>
-                                <th class="py-2 px-4 border">Register Date</th>
+                                <th class="py-2 px-4 border">Tanggal Pendaftaran</th>
                                 <th class="py-2 px-4 border">Foto</th>
                                 <th class="py-2 px-4 border">Aksi</th>
                             </tr>

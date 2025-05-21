@@ -12,6 +12,11 @@ class Pendaftaran extends Model
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
-        'nik', 'nama', 'no_rm', 'alamat', 'agama', 'tanggal_lahir', 'register_date', 'foto'
+        'nama', 'no_rm', 'pendaftaran_date', 'no_pendaftaran'
     ];
+
+    public function pasien()
+    {
+        return $this->belongsTo(Pasien::class, 'no_rm', 'no_rm');
+    }
 }
