@@ -1,14 +1,13 @@
-
 <x-app-layout>
     <x-slot name="header">
         <div class="flex justify-between items-center">
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                {{ __('Master Data Pasien') }}
+                {{ __('Pendaftaran Pasien') }}
             </h2>
         </div>
     </x-slot>
 
-    <div class="py-12" x-data="{ open: false, editModalOpen: false, selectedPasien: {} }">
+    <div class="py-12" x-data="{ open: false, editModalOpen: false, selectedPendaftar: {} }">
         <div class="max-w-screen-xl mx-auto px-6">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
@@ -25,45 +24,30 @@
                             style="background-color: #003E93;"
                             onmouseover="this.style.backgroundColor='#002A6D'"
                             onmouseout="this.style.backgroundColor='#003E93'">
-                            + Tambah Pasien
+                            + Tambah Pendaftaran
                         </button>
                     </div>
                     <table class="min-w-full bg-white border mt-4">
                         <thead>
                             <tr class="bg-green-600 text-white text-left">
-                                <th class="py-2 px-4 border">NIK</th>
                                 <th class="py-2 px-4 border">Nama</th>
                                 <th class="py-2 px-4 border">No. RM</th>
-                                <th class="py-2 px-4 border">Alamat</th>
-                                <th class="py-2 px-4 border">Agama</th>
-                                <th class="py-2 px-4 border">Tanggal Lahir</th>
-                                <th class="py-2 px-4 border">Register Date</th>
-                                <th class="py-2 px-4 border">Foto</th>
+                                <th class="py-2 px-4 border">No. Pendaftaran</th>
+                                <th class="py-2 px-4 border">Tanggal Mendaftar</th>
                                 <th class="py-2 px-4 border">Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach ($pasiens as $pasien)
+                            @foreach ($pendaftaran as $pendaftar)
                                 <tr class="hover:bg-gray-100">
-                                    <td class="py-2 px-4 border">{{ $pasien->nik }}</td>
-                                    <td class="py-2 px-4 border">{{ $pasien->nama }}</td>
-                                    <td class="py-2 px-4 border">{{ $pasien->no_rm }}</td>
-                                    <td class="py-2 px-4 border">{{ $pasien->alamat }}</td>
-                                    <td class="py-2 px-4 border">{{ $pasien->agama }}</td>
-                                    <td class="py-2 px-4 border">{{ $pasien->tanggal_lahir }}</td>
-                                    <td class="py-2 px-4 border">{{ $pasien->register_date }}</td>
-                                    <td class="py-2 px-4 border">
-                                        @if ($pasien->foto)
-                                            <img src="{{ asset('storage/' . $pasien->foto) }}" alt="Foto" class="h-12 w-12 rounded-full object-cover">
-                                        @else
-                                            <span class="italic text-gray-400 text-sm">Tidak ada</span>
-                                        @endif
-                                    </td>
+                                    <td class="py-2 px-4 border">{{ $pendaftar->nama }}</td>
+                                    <td class="py-2 px-4 border">{{ $pendaftar->no_rm }}</td>
+                                    <td class="py-2 px-4 border">{{ $pendaftar->pendaftaran_date }}</td>
                                     <td class="py-2 px-4 border">
                                         <div class="flex flex-wrap items-center gap-2">
-                                            @if ($pasien->trashed())
+                                            @if ($pendaftar->trashed())
                                                 <!-- Tombol Restore -->
-                                                <form action="{{ route('pasiens.restore', $pasien->id) }}" method="POST" onsubmit="return confirm('Kembalikan data ini?')" class="inline">
+                                                <form action="{{ route('pendaftaran.restore', $pasien->id) }}" method="POST" onsubmit="return confirm('Kembalikan data ini?')" class="inline">
                                                     @csrf
                                                     <button type="submit"
                                                             class="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded text-sm inline-flex items-center justify-center"
@@ -77,7 +61,7 @@
                                                 </form>
 
                                                 <!-- Tombol Hapus Permanen -->
-                                                <form action="{{ route('pasiens.forceDelete', $pasien->id) }}" method="POST" onsubmit="return confirm('Hapus permanen data ini?')" class="inline">
+                                                <form action="{{ route('pendaftaran.forceDelete', $pasien->id) }}" method="POST" onsubmit="return confirm('Hapus permanen data ini?')" class="inline">
                                                     @csrf
                                                     @method('DELETE')
                                                     <button type="submit"
@@ -93,7 +77,7 @@
                                             @else
                                                 <!-- Tombol Edit -->
                                                 <button 
-                                                    @click="editModalOpen = true; selectedPasien = {{ json_encode($pasien) }}" 
+                                                    @click="editModalOpen = true; selectedPendaftar = {{ json_encode($pasien) }}" 
                                                     class="bg-yellow-500 hover:bg-yellow-600 text-white p-2 rounded text-sm inline-flex items-center justify-center"
                                                     title="Edit">
                                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
@@ -104,7 +88,7 @@
                                                 </button>
 
                                                 <!-- Tombol Soft Delete (Trash Icon) -->
-                                                <form action="{{ route('pasiens.destroy', $pasien->id) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus data ini?')" class="inline">
+                                                <form action="{{ route('pendaftaran.destroy', $pasien->id) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus data ini?')" class="inline">
                                                     @csrf
                                                     @method('DELETE')
                                                     <button type="submit"
@@ -125,12 +109,12 @@
                         </tbody>
                     </table>
                     <div class="flex justify-end gap-2 mt-4">
-                        <a href="{{ route('pasiens.export.excel') }}" 
+                        <a href="{{ route('pendaftaran.export.excel') }}" 
                         class="bg-green-600 hover:bg-green-700 text-white px-4 py-1 rounded">
                         Export Excel
                         </a>
 
-                        <a href="{{ route('pasiens.export.pdf') }}" 
+                        <a href="{{ route('pendaftaran.export.pdf') }}" 
                         class="bg-red-600 hover:bg-red-700 text-white px-4 py-1 rounded">
                         Export PDF
                         </a>
@@ -149,14 +133,9 @@
                 @click.outside="open = false" 
                 class="bg-white p-6 rounded-lg shadow-lg w-full max-w-2xl"
             >
-                <h2 class="text-xl font-semibold mb-4">Tambah Pasien</h2>
-                <form action="{{ route('pasiens.store') }}" method="POST" enctype="multipart/form-data" class="grid grid-cols-1 md:grid-cols-1 gap-4">
+                <h2 class="text-xl font-semibold mb-4">Daftar Pasien</h2>
+                <form action="{{ route('pendaftaran.store') }}" method="POST" enctype="multipart/form-data" class="grid grid-cols-1 md:grid-cols-1 gap-4">
                     @csrf
-
-                    <div class="flex flex-col">
-                        <label for="nik" class="text-sm text-gray-700 mb-1">Nomor Induk Kependudukan (NIK)</label>
-                        <input type="text" id="nik" name="nik" required placeholder="Masukkan NIK" class="border px-2 py-1 rounded">
-                    </div>
 
                     <div class="flex flex-col">
                         <label for="nama" class="text-sm text-gray-700 mb-1">Nama Lengkap</label>
@@ -164,29 +143,8 @@
                     </div>
 
                     <div class="flex flex-col">
-                        <label for="alamat" class="text-sm text-gray-700 mb-1">Alamat</label>
-                        <input type="text" id="alamat" name="alamat" required placeholder="Masukkan alamat lengkap" class="border px-2 py-1 rounded">
-                    </div>
-
-                    <div class="flex flex-col">
-                        <label for="agama" class="text-sm text-gray-700 mb-1">Agama</label>
-                        <select id="agama" name="agama" required class="border px-2 py-1 rounded">
-                            <option value="">Pilih Agama</option>
-                            <option value="Islam">Islam</option>
-                            <option value="Kristen">Kristen</option>
-                            <option value="Hindu">Hindu</option>
-                            <option value="Budha">Budha</option>
-                        </select>
-                    </div>
-
-                    <div class="flex flex-col">
-                        <label for="tanggal_lahir" class="text-sm text-gray-700 mb-1">Tanggal Lahir</label>
+                        <label for="tanggal_lahir" class="text-sm text-gray-700 mb-1">Tanggal Pendaftaran</label>
                         <input type="date" id="tanggal_lahir" name="tanggal_lahir" required class="border px-2 py-1 rounded">
-                    </div>
-
-                    <div class="flex flex-col">
-                        <label for="foto" class="text-sm text-gray-700 mb-1">Foto Pasien</label>
-                        <input type="file" id="foto" name="foto" accept="image/*" class="border px-2 py-1 rounded">
                     </div>
 
                     <div class="col-span-full flex justify-end gap-2 mt-4">
@@ -205,47 +163,12 @@
         <div x-show="editModalOpen" x-cloak class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
             <div @click.outside="editModalOpen = false" class="bg-white p-6 rounded-lg shadow-lg w-full max-w-2xl">
                 <h2 class="text-xl font-semibold mb-4">Edit Pasien</h2>
-                <form :action="`/pasiens/${selectedPasien.id}`" method="POST" enctype="multipart/form-data" class="grid grid-cols-1 gap-4">
+                <form :action="`/pendaftaran/${selectedPendaftar.id}`" method="POST" enctype="multipart/form-data" class="grid grid-cols-1 gap-4">
                     @csrf
                     @method('PUT')
+                    
+                    <input type="text" name="nama" class="border px-2 py-1 rounded" x-model="selectedPendaftar.nama">
 
-                    <input type="text" name="nik" class="border px-2 py-1 rounded" x-model="selectedPasien.nik">
-                    <input type="text" name="nama" class="border px-2 py-1 rounded" x-model="selectedPasien.nama">
-                    <input type="text" name="alamat" class="border px-2 py-1 rounded" x-model="selectedPasien.alamat">
-
-                    <select name="agama" class="border px-2 py-1 rounded" x-model="selectedPasien.agama">
-                        <option value="Islam">Islam</option>
-                        <option value="Kristen">Kristen</option>
-                        <option value="Hindu">Hindu</option>
-                        <option value="Budha">Budha</option>
-                    </select>
-
-                    <input type="date" name="tanggal_lahir" class="border px-2 py-1 rounded" x-model="selectedPasien.tanggal_lahir">
-
-                    <!-- Preview Foto -->
-                    <template x-if="selectedPasien.foto">
-                        <div>
-                            <p class="text-sm text-gray-600 mb-1">Foto Saat Ini:</p>
-                            <img :src="`/storage/${selectedPasien.foto}`" alt="Foto Pasien" class="h-16 w-16 rounded-full object-cover border">
-                        </div>
-                    </template>
-
-                    <!-- Input Ganti Foto -->
-                    <div class="flex flex-col">
-                        <label for="edit_foto" class="text-sm text-gray-700 mb-1">Foto</label>
-                        <input 
-                            type="file" 
-                            id="edit_foto" 
-                            name="foto" 
-                            accept="image/*" 
-                            class="border px-2 py-1 rounded file:mr-4 file:py-1 file:px-2 file:rounded file:border-0 file:text-sm file:bg-gray-200 file:text-gray-700"
-                            x-ref="fileInput"
-                            @click="$refs.fileInput.value = null"
-                        >
-                        <template x-if="selectedPasien.foto">
-                            <p class="text-xs text-gray-500 mt-1 italic break-all">File saat ini: <span x-text="selectedPasien.foto.split('/').pop()"></span></p>
-                        </template>
-                    </div>
                     <div class="flex justify-end gap-2 mt-4">
                         <button type="button" @click="editModalOpen = false" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded">
                             Cancel

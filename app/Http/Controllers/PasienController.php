@@ -16,10 +16,9 @@ class PasienController extends Controller
         $this->middleware('auth');
     }
 
-    // Tampilkan daftar pasien
     public function index(Request $request)
     {
-        $query = Pasien::query();
+        $query = Pasien::withTrashed();
 
         if ($request->filled('tanggal')) {
             $query->whereDate('register_date', $request->tanggal);
@@ -32,13 +31,11 @@ class PasienController extends Controller
         ]);
     }
 
-    // Form tambah pasien
     public function create()
     {
         return view('pasiens.create');
     }
 
-    // Generate nomor rekam medis otomatis
     private function generateNoRM()
     {
         $datePart = Carbon::now()->format('ymd');
@@ -46,7 +43,6 @@ class PasienController extends Controller
         return $datePart . '-' . str_pad($countToday, 3, '0', STR_PAD_LEFT);
     }
 
-    // Simpan data pasien baru
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -69,7 +65,6 @@ class PasienController extends Controller
                     $filename = uniqid() . '.' . $foto->getClientOriginalExtension();
                     $destinationPath = public_path('storage/foto_pasien');
 
-                    // Buat folder jika belum ada
                     if (!file_exists($destinationPath)) {
                         mkdir($destinationPath, 0755, true);
                     }
@@ -89,7 +84,6 @@ class PasienController extends Controller
         return redirect()->route('pasiens.index')->with('success', 'Pasien berhasil ditambahkan');
     }
 
-    // Update data pasien
     public function update(Request $request, string $id)
     {
         $validated = $request->validate([
@@ -130,16 +124,27 @@ class PasienController extends Controller
         return redirect()->route('pasiens.index')->with('success', 'Data pasien berhasil diperbarui');
     }
 
-    public function destroy(string $id)
+    public function destroy($id)
     {
         $pasien = Pasien::findOrFail($id);
-        $pasien->delete();
+        $pasien->delete(); 
 
-        return redirect()->route('pasiens.index')->with('success', 'Data pasien berhasil dihapus');
+        return redirect()->route('pasiens.index')->with('success', 'Data pasien berhasil dihapus (soft delete).');
     }
 
-    public function show(string $id)
+    public function forceDelete($id)
     {
-        //
+        $pasien = Pasien::onlyTrashed()->findOrFail($id);
+        $pasien->forceDelete();
+
+        return redirect()->route('pasiens.index')->with('success', 'Data pasien dihapus permanen.');
+    }
+
+    public function restore($id)
+    {
+        $pasien = Pasien::onlyTrashed()->findOrFail($id);
+        $pasien->restore();
+
+        return redirect()->route('pasiens.index')->with('success', 'Data pasien berhasil dikembalikan');
     }
 }

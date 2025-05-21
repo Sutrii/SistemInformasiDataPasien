@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\PasienController;
+use App\Http\Controllers\PendaftaranController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Exports\PasienExport;
@@ -8,20 +9,34 @@ use Maatwebsite\Excel\Facades\Excel;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\Pasien;
 
-Route::get('/', [PasienController::class, 'index'])->name('dashboard');
+Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 
-Route::get('/export-excel', function () {
+Route::get('/export-excel-pasien', function () {
     return Excel::download(new PasienExport, 'data_pasien.xlsx');
 })->name('pasiens.export.excel');
 
-Route::get('/export-pdf', function () {
+Route::get('/export-excel-pendaftar', function () {
+    return Excel::download(new PasienExport, 'data_pendaftaran.xlsx');
+})->name('pendaftaran.export.excel');
+
+Route::get('/export-pdf-pasien', function () {
     $pasiens = Pasien::select('nik', 'nama', 'no_rm', 'alamat', 'agama', 'tanggal_lahir', 'register_date')->get();
     $pdf = Pdf::loadView('exports.pasien_pdf', compact('pasiens'))->setPaper('a4', 'landscape');
     return $pdf->download('data_pasien.pdf');
 })->name('pasiens.export.pdf');
 
+Route::get('/export-pdf-pendaftar', function () {
+    $pasiens = Pasien::select('nik', 'nama', 'no_rm', 'alamat', 'agama', 'tanggal_lahir', 'register_date')->get();
+    $pdf = Pdf::loadView('exports.pasien_pdf', compact('pasiens'))->setPaper('a4', 'landscape');
+    return $pdf->download('data_pendaftar.pdf');
+})->name('pendaftaran.export.pdf');
+
 Route::middleware(['auth'])->group(function () {
     Route::resource('pasiens', PasienController::class);
+    Route::resource('pendaftaran', PendaftaranController::class);
+
+    Route::post('/pasiens/{id}/restore', [PasienController::class, 'restore'])->name('pasiens.restore');
+    Route::delete('/pasiens/{id}/force-delete', [PasienController::class, 'forceDelete'])->name('pasiens.forceDelete');
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
