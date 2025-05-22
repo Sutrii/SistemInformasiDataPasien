@@ -151,21 +151,22 @@ class PendaftaranController extends Controller
         $startDate = $request->query('start_date');
         $endDate = $request->query('end_date');
 
-        $start = $end = null;
         $query = Pendaftaran::with('pasien')->withTrashed();
 
-        if (!empty($startDate) && !empty($endDate)) {
+        if ($startDate && $endDate) {
             $start = Carbon::parse($startDate);
-            $end = Carbon::parse($endDate)->endOfDay(); // penting untuk mengikutkan jam terakhir hari itu
-
+            $end = Carbon::parse($endDate)->endOfDay();
             $query->whereBetween('pendaftaran_date', [$start, $end]);
         }
 
         $pendaftaran = $query->orderByDesc('pendaftaran_date')->get();
 
-        $pdf = Pdf::loadView('exports.pendataan_pdf', compact('pendaftaran', 'start', 'end'))
-                ->setPaper('a4', 'landscape');
-
-        return $pdf->download('data_pendaftar.pdf');
+        return Pdf::loadView('exports.pendataan_pdf', [
+            'pendaftaran' => $pendaftaran,
+            'start' => isset($start) ? $start : null,
+            'end' => isset($end) ? $end : null
+        ])->setPaper('a4', 'landscape')
+        ->download('data_pendaftar.pdf');
     }
+
 }

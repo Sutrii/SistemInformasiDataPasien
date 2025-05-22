@@ -133,10 +133,8 @@
                             Export Excel
                         </a>
 
-                        <a href="{{ route('pendaftaran.export.pdf') }}"
-                            @if(request('start_date') && request('end_date'))
-                                href="{{ route('pendaftaran.export.pdf', ['start_date' => request('start_date'), 'end_date' => request('end_date')]) }}"
-                            @endif
+                        <a 
+                            href="{{ route('pendaftaran.export.pdf', request()->only(['start_date', 'end_date'])) }}"
                             class="bg-red-600 hover:bg-red-700 text-white px-4 py-1 rounded">
                             Export PDF
                         </a>

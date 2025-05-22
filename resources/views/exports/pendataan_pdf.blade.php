@@ -107,8 +107,6 @@
     @if($start && $end)
         <p style="text-align: center; font-size: 13px;">Periode: {{ $start->format('d-m-Y') }} s/d {{ $end->format('d-m-Y') }}</p>
     @endif
-
-    @if($pendaftaran->count())
         <table>
         <thead>
             <tr>
@@ -138,15 +136,10 @@
                 </tr>
             @empty
                 <tr>
-                    <td colspan="9" style="text-align: center; font-size: 14px;">
-                        Tidak ada data pendaftaran pada periode tersebut.
-                    </td>
+                    <td colspan="9">Tidak ada data pendaftaran pada periode tersebut.</td>
                 </tr>
             @endforelse
         </tbody>
     </table>
-    @else
-        <p class="no-data">Tidak ada data pendaftaran pada periode tersebut.</p>
-    @endif
 </body>
 </html>
