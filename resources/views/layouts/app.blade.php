@@ -53,5 +53,14 @@
 
         <!-- AdminLTE JS -->
         <script src="{{ asset('build/assets/adminlte.js') }}"></script>
+
+        <!-- Sidebar Toggle Manual -->
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                document.querySelector('[data-widget="pushmenu"]')?.addEventListener('click', function () {
+                    document.body.classList.toggle('sidebar-collapse');
+                });
+            });
+        </script>
     </body>
 </html>

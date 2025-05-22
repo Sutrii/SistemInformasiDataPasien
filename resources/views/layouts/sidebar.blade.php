@@ -12,24 +12,27 @@
       <ul class="nav sidebar-menu flex-column" role="menu">
         <!-- Dashboard -->
         <li class="nav-item">
-            <a href="{{ url('/dashboard') }}" class="nav-link {{ request()->is('dashboard') ? 'active' : '' }}">
+            <a href="{{ url('/dashboard') }}"
+               class="nav-link hover:bg-[#e3ab2c] hover:text-black {{ request()->is('dashboard') ? 'bg-[#F6C244] text-black font-semibold' : '' }}">
                 <i class="nav-icon bi bi-speedometer"></i>
                 <p>Dashboard</p>
             </a>
         </li>
 
-        <!-- Data Pasien -->
+        <!-- Pendataan Pasien -->
         <li class="nav-item">
-            <a href="{{ url('/pasiens') }}" class="nav-link {{ request()->is('pasiens') ? 'active' : '' }}">
-                <i class="nav-icon bi bi-speedometer"></i>
+            <a href="{{ url('/pasiens') }}"
+               class="nav-link hover:bg-[#e3ab2c] hover:text-black {{ request()->is('pasiens') ? 'bg-[#F6C244] text-black font-semibold' : '' }}">
+                <i class="nav-icon bi bi-person-lines-fill"></i>
                 <p>Pendataan Pasien</p>
             </a>
         </li>
 
-        <!-- Data Pasien -->
+        <!-- Pendaftaran Pasien -->
         <li class="nav-item">
-            <a href="{{ url('/pendaftaran') }}" class="nav-link {{ request()->is('pendaftaran') ? 'active' : '' }}">
-                <i class="nav-icon bi bi-speedometer"></i>
+            <a href="{{ url('/pendaftaran') }}"
+               class="nav-link hover:bg-[#e3ab2c] hover:text-black {{ request()->is('pendaftaran') ? 'bg-[#F6C244] text-black font-semibold' : '' }}">
+                <i class="nav-icon bi bi-journal-plus"></i>
                 <p>Pendaftaran Pasien</p>
             </a>
         </li>

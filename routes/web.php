@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PasienController;
 use App\Http\Controllers\PendaftaranController;
 use App\Http\Controllers\ProfileController;
@@ -9,7 +10,7 @@ use Maatwebsite\Excel\Facades\Excel;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\Pasien;
 
-Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+Route::get('/dashboard', [DashboardController::class, 'index']);
 
 Route::get('/export-excel-pasien', [PasienController::class, 'exportExcel'])->name('pasiens.export.excel');
 
@@ -17,11 +18,7 @@ Route::get('/export-excel-pendaftar', [PendaftaranController::class, 'exportExce
 
 Route::get('/export-pdf-pasien', [PasienController::class, 'exportPdf'])->name('pasiens.export.pdf');
 
-Route::get('/export-pdf-pendaftar', function () {
-    $pasiens = Pasien::select('nik', 'nama', 'no_rm', 'alamat', 'agama', 'tanggal_lahir', 'register_date')->get();
-    $pdf = Pdf::loadView('exports.pasien_pdf', compact('pasiens'))->setPaper('a4', 'landscape');
-    return $pdf->download('data_pendaftar.pdf');
-})->name('pendaftaran.export.pdf');
+Route::get('/export-pdf-pendaftar', [PendaftaranController::class, 'exportPdf'])->name('pendaftaran.export.pdf');
 
 Route::middleware(['auth'])->group(function () {
     Route::resource('pasiens', PasienController::class);

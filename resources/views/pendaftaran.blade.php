@@ -49,7 +49,7 @@
 
                     <table class="min-w-full bg-white border mt-4">
                         <thead>
-                            <tr class="bg-green-600 text-white text-left">
+                            <tr class="bg-green-600 text-white text-center">
                                 <th class="py-2 px-4 border">Nama</th>
                                 <th class="py-2 px-4 border">No. RM</th>
                                 <th class="py-2 px-4 border">No. Pendaftaran</th>
@@ -127,16 +127,18 @@
                             @endforeach
                         </tbody>
                     </table>
-
                     <div class="flex justify-end gap-2 mt-4">
                         <a href="{{ route('pendaftaran.export.excel', ['start_date' => request('start_date'), 'end_date' => request('end_date')]) }}"
-                        class="bg-green-600 hover:bg-green-700 text-white px-4 py-1 rounded">
-                        Export Excel
+                            class="bg-green-600 hover:bg-green-700 text-white px-4 py-1 rounded">
+                            Export Excel
                         </a>
 
-                        <a href="{{ route('pendaftaran.export.pdf') }}" 
-                        class="bg-red-600 hover:bg-red-700 text-white px-4 py-1 rounded">
-                        Export PDF
+                        <a href="{{ route('pendaftaran.export.pdf') }}"
+                            @if(request('start_date') && request('end_date'))
+                                href="{{ route('pendaftaran.export.pdf', ['start_date' => request('start_date'), 'end_date' => request('end_date')]) }}"
+                            @endif
+                            class="bg-red-600 hover:bg-red-700 text-white px-4 py-1 rounded">
+                            Export PDF
                         </a>
                     </div>
                 </div>

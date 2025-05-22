@@ -9,6 +9,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use App\Exports\PendataanPasienExport;
 use Maatwebsite\Excel\Facades\Excel;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class PendaftaranController extends Controller
 {
@@ -47,6 +48,8 @@ class PendaftaranController extends Controller
         $query = Pendaftaran::withTrashed();
 
         if ($start && $end) {
+            $start = Carbon::parse($start);
+            $end = Carbon::parse($end)->endOfDay();         
             $query->whereBetween('pendaftaran_date', [$start, $end]);
         }
 
@@ -141,5 +144,28 @@ class PendaftaranController extends Controller
         $end = $request->query('end_date');
 
         return Excel::download(new PendataanPasienExport($start, $end), 'data_pendaftaran.xlsx');
+    }
+
+    public function exportPdf(Request $request)
+    {
+        $startDate = $request->query('start_date');
+        $endDate = $request->query('end_date');
+
+        $start = $end = null;
+        $query = Pendaftaran::with('pasien')->withTrashed();
+
+        if (!empty($startDate) && !empty($endDate)) {
+            $start = Carbon::parse($startDate);
+            $end = Carbon::parse($endDate)->endOfDay(); // penting untuk mengikutkan jam terakhir hari itu
+
+            $query->whereBetween('pendaftaran_date', [$start, $end]);
+        }
+
+        $pendaftaran = $query->orderByDesc('pendaftaran_date')->get();
+
+        $pdf = Pdf::loadView('exports.pendataan_pdf', compact('pendaftaran', 'start', 'end'))
+                ->setPaper('a4', 'landscape');
+
+        return $pdf->download('data_pendaftar.pdf');
     }
 }

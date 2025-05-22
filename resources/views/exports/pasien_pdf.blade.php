@@ -111,10 +111,31 @@
             </tr>
         </thead>
         <tbody>
-            @forelse($pasiens as $pasien)
+        @php
+            $adaData = false;
+        @endphp
+
+        @foreach($pasiens as $pasien)
+            @if($pasien->pendaftarans->count())
+                @foreach($pasien->pendaftarans as $pendaftaran)
+                    @php $adaData = true; @endphp
+                    <tr>
+                        <td>{{ $pendaftaran->no_pendaftaran }}</td>
+                        <td>{{ $pendaftaran->pendaftaran_date }}</td>
+                        <td>{{ $pasien->nik }}</td>
+                        <td>{{ $pasien->nama }}</td>
+                        <td>{{ $pasien->no_rm }}</td>
+                        <td>{{ $pasien->alamat }}</td>
+                        <td>{{ $pasien->agama }}</td>
+                        <td>{{ $pasien->tanggal_lahir }}</td>
+                        <td>{{ $pasien->register_date }}</td>
+                    </tr>
+                @endforeach
+            @else
+                @php $adaData = true; @endphp
                 <tr>
-                    <td>{{ $pasien->pendaftaran->no_pendaftaran ?? '-' }}</td>
-                    <td>{{ $pasien->pendaftaran->pendaftaran_date ?? '-' }}</td>
+                    <td>-</td>
+                    <td>-</td>
                     <td>{{ $pasien->nik }}</td>
                     <td>{{ $pasien->nama }}</td>
                     <td>{{ $pasien->no_rm }}</td>
@@ -123,12 +144,14 @@
                     <td>{{ $pasien->tanggal_lahir }}</td>
                     <td>{{ $pasien->register_date }}</td>
                 </tr>
-            @empty
-                <tr>
-                    <td colspan="9">Tidak ada data</td>
-                </tr>
-            @endforelse
+            @endif
+        @endforeach
+
+        @if(!$adaData)
+            <tr>
+                <td colspan="9">Tidak ada data</td>
+            </tr>
+        @endif
         </tbody>
-    </table>
 </body>
 </html>

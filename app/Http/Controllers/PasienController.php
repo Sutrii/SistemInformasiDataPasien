@@ -6,7 +6,6 @@ use Illuminate\Http\Request;
 use App\Models\Pasien;
 use Illuminate\Support\Carbon;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Log;
 use App\Exports\PasienExport;
 use Maatwebsite\Excel\Facades\Excel;
@@ -29,33 +28,27 @@ class PasienController extends Controller
 
         $pasiens = $query->orderByDesc('register_date')->get();
 
-        return view('dashboard', [
+        return view('pasien', [
             'pasiens' => $pasiens
         ]);
-    }
-
-    public function create()
-    {
-        return view('pasiens.create');
     }
 
     private function generateNoRM()
     {
         $datePart = Carbon::now()->format('ymd');
 
-        $latestPasien = Pasien::withTrashed()
-            ->where('no_rm', 'like', $datePart . '-%')
-            ->orderByDesc('no_rm')
-            ->first();
+        do {
+            $latestPasien = Pasien::withTrashed()
+                ->where('no_rm', 'like', $datePart . '%')
+                ->orderByDesc('no_rm')
+                ->first();
 
-        if ($latestPasien) {
-            $lastNumber = (int)substr($latestPasien->no_rm, -3);
-            $nextNumber = $lastNumber + 1;
-        } else {
-            $nextNumber = 1;
-        }
+            $nextNumber = $latestPasien ? ((int)substr($latestPasien->no_rm, -3)) + 1 : 1;
+            $no_rm = $datePart . str_pad($nextNumber, 3, '0', STR_PAD_LEFT);
 
-        return $datePart . str_pad($nextNumber, 3, '0', STR_PAD_LEFT);
+        } while (Pasien::withTrashed()->where('no_rm', $no_rm)->exists());
+
+        return $no_rm;
     }
 
     public function store(Request $request)
@@ -172,16 +165,20 @@ class PasienController extends Controller
     public function exportPdf(Request $request)
     {
         $tanggal = $request->query('tanggal');
-    
-        $query = Pasien::with('pendaftaran')->withTrashed();
-    
+
+        $query = Pasien::with(['pendaftarans' => function ($q) {
+            $q->withTrashed()->orderByDesc('pendaftaran_date');
+        }])->withTrashed();
+
         if (!empty($tanggal)) {
             $query->whereDate('register_date', '=', $tanggal);
         }
-    
+
         $pasiens = $query->get();
-    
-        $pdf = Pdf::loadView('exports.pasien_pdf', compact('pasiens'))->setPaper('a4', 'landscape');
+
+        $pdf = Pdf::loadView('exports.pasien_pdf', compact('pasiens'))
+                ->setPaper('a4', 'landscape');
+
         return $pdf->download('data_pasien.pdf');
-    }    
+    }
 }

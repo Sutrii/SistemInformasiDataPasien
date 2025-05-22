@@ -29,7 +29,7 @@
                     </div>
                     <table class="min-w-full bg-white border mt-4">
                         <thead>
-                            <tr class="bg-green-600 text-white text-left">
+                            <tr class="bg-green-600 text-white text-center">
                                 <th class="py-2 px-4 border">NIK</th>
                                 <th class="py-2 px-4 border">Nama</th>
                                 <th class="py-2 px-4 border">No. RM</th>
@@ -126,6 +126,7 @@
                                 class="bg-green-600 hover:bg-green-700 text-white px-4 py-1 rounded">
                                 Export Excel
                             </button>
+                        </form>
                         <form method="GET" action="{{ route('pasiens.export.pdf') }}">
                             <input type="hidden" name="tanggal" value="{{ request('tanggal') }}">
                             <button type="submit"

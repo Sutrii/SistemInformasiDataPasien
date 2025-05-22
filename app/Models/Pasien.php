@@ -14,8 +14,20 @@ class Pasien extends Model
         'nik', 'nama', 'no_rm', 'alamat', 'agama', 'tanggal_lahir', 'register_date', 'foto'
     ];
 
-    public function pendaftaran()
+    public function pendaftarans()
     {
-        return $this->hasOne(Pendaftaran::class, 'no_rm', 'no_rm');
+        return $this->hasMany(\App\Models\Pendaftaran::class, 'no_rm', 'no_rm');
+    }
+
+    public function getNoRmAttribute($value)
+    {
+        return trim($value);
+    }
+
+    public function latestPendaftaran()
+    {
+        return $this->hasOne(\App\Models\Pendaftaran::class, 'no_rm', 'no_rm')
+                    ->withTrashed()
+                    ->latestOfMany('pendaftaran_date');
     }
 }
